@@ -37,15 +37,14 @@ func GetContacts(w http.ResponseWriter, r *http.Request) {
 
 func UpdateContacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var contactUpdate contacts
-	if err := json.NewDecoder(r.Body).Decode(&contactUpdate); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&contact); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err.Error())
 		return
 	}
-	if err := json.NewEncoder(w).Encode(contact); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
-	}
+	//if err := json.NewEncoder(w).Encode(contact); err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	log.Println(err.Error())
+	//	return
+	//}
 }
