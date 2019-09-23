@@ -1,20 +1,15 @@
 package main
 
 import (
+	"./authentication"
 	"./contacts"
 	"./events"
 	"./indexbanners"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
-
-/*
-type user struct {
-	Login        string `json:"login"`
-	PasswordHash string `json:"hash"`
-}
-*/
 
 func main() {
 	router := mux.NewRouter()
@@ -22,6 +17,9 @@ func main() {
 	events.DataInit()
 	indexbanners.DataInit()
 	contacts.DataInit()
+	authentication.DataInit()
+
+	router.Use(authentication.Authentication)
 
 	//Events handlers
 	router.HandleFunc("/events", events.GetEvents).Methods("GET")
@@ -40,12 +38,12 @@ func main() {
 	//Contacts handlers (Функционал для контактов)
 	router.HandleFunc("/contacts", contacts.GetContacts).Methods("GET")
 	router.HandleFunc("/contacts", contacts.UpdateContacts).Methods("PUT")
-
 	/*
 		//Users handlers (Функционал для пользователей)
 		router.HandleFunc("/users", getUsers).Methods("GET")
 		router.HandleFunc("/users", createUser).Methods("POST")
 		router.HandleFunc("/users/{id}", updateUser).Methods("PUT")
 	*/
+	fmt.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
