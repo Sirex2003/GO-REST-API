@@ -26,25 +26,20 @@ func DataInit() {
 	contact.MapCode = "https://example.com/map?=12kflankjshiu34rcoqiy"
 }
 
-func GetContacts(w http.ResponseWriter, r *http.Request) {
+func Contacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(contact); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
+	switch r.Method {
+	case http.MethodGet:
+		if err := json.NewEncoder(w).Encode(contact); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+	case http.MethodPut:
+		if err := json.NewDecoder(r.Body).Decode(&contact); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
 	}
-}
-
-func UpdateContacts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewDecoder(r.Body).Decode(&contact); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
-	}
-	//if err := json.NewEncoder(w).Encode(contact); err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	log.Println(err.Error())
-	//	return
-	//}
 }

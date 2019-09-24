@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type indexBanner struct {
@@ -55,32 +56,49 @@ func GetIndexBannersVisible(w http.ResponseWriter, r *http.Request) {
 func UpdateIndexBanner(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for index, item := range indexBanners {
-		if item.ID == params["id"] {
-			indexBanners = append(indexBanners[:index], indexBanners[index+1:]...)
-			var event indexBanner
-			_ = json.NewDecoder(r.Body).Decode(&event)
-			event.ID = params["id"]
-			indexBanners = append(indexBanners, event)
-			if err := json.NewEncoder(w).Encode(event); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Println(err.Error())
+	var banner indexBanner
+	if _, err := strconv.Atoi(params["id"]); err != nil {
+		http.Error(w, "ID is not a number", http.StatusBadRequest)
+		log.Println(err.Error())
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		for _, item := range indexBanners {
+			if item.ID == params["id"] {
+				if err := json.NewEncoder(w).Encode(item); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Fatal(err.Error())
+					return
+				}
 				return
 			}
-			return
 		}
-	}
-	http.Error(w, "ID not found", http.StatusBadRequest)
-}
-
-func UpdateIndexBannersVisibility(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	for index, item := range indexBanners {
-		if item.ID == params["id"] {
-			indexBanners = append(indexBanners[:index], indexBanners[index+1:]...)
-			break
+		http.Error(w, "ID not found", http.StatusNoContent)
+	case http.MethodPut:
+		for index, item := range indexBanners {
+			if item.ID == params["id"] {
+				indexBanners = append(indexBanners[:index], indexBanners[index+1:]...)
+				_ = json.NewDecoder(r.Body).Decode(&banner)
+				banner.ID = params["id"]
+				indexBanners = append(indexBanners, banner)
+				if err := json.NewEncoder(w).Encode(banner); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Println(err.Error())
+					return
+				}
+				return
+			}
 		}
+		http.Error(w, "ID not found", http.StatusBadRequest)
+	case http.MethodPatch:
+		_ = json.NewDecoder(r.Body).Decode(&banner)
+		for index, item := range indexBanners {
+			if item.ID == params["id"] {
+				indexBanners[index].IsHidden = banner.IsHidden
+				return
+			}
+		}
+		http.Error(w, "ID not found", http.StatusBadRequest)
 	}
-	http.Error(w, "ID not found", http.StatusBadRequest)
 }

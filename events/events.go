@@ -31,36 +31,50 @@ func DataInit() {
 }
 
 // Events functions
-func GetEvents(w http.ResponseWriter, r *http.Request) {
+func Events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(events); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
+	switch r.Method {
+	case http.MethodGet:
+		if err := json.NewEncoder(w).Encode(events); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+	case http.MethodPost:
+		var event event
+		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		event.ID = strconv.Itoa(rand.Intn(100))
+		events = append(events, event)
+		if err := json.NewEncoder(w).Encode(event); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
 	}
 }
 
-func GetEventsYear(w http.ResponseWriter, r *http.Request) {
+//YearEvents
+func YearEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	str, err := strconv.Atoi(params["year"])
 	switch {
 	case params["year"] == "":
-		http.Error(w, "Year can not be empty", http.StatusBadRequest)
-		log.Println(r, "Year set empty")
+		http.Error(w, "YearEvents can not be empty", http.StatusBadRequest)
+		log.Println(r, "YearEvents set empty")
 		return
 	case err != nil:
-		http.Error(w, "Year must be a number", http.StatusBadRequest)
-		log.Println(r, "Year set as letters")
+		http.Error(w, "YearEvents must be a number", http.StatusBadRequest)
+		log.Println(r, "YearEvents set as letters")
 		return
 	case 2000 < str || str > time.Now().Year():
-		http.Error(w, "Invalid Year value", http.StatusBadRequest)
-		log.Println(r, "Invalid Year value")
+		http.Error(w, "Invalid YearEvents value", http.StatusBadRequest)
+		log.Println(r, "Invalid YearEvents value")
 		return
-	}
-
-	if params["year"] == "" {
-
 	}
 	var date time.Time
 	for _, item := range events {
@@ -73,10 +87,10 @@ func GetEventsYear(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	http.Error(w, "Year not found", http.StatusNoContent)
+	http.Error(w, "YearEvents not found", http.StatusNoContent)
 }
 
-func GetEvent(w http.ResponseWriter, r *http.Request) {
+func IDEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	if _, err := strconv.Atoi(params["id"]); err != nil {
@@ -84,74 +98,43 @@ func GetEvent(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	for _, item := range events {
-		if item.ID == params["id"] {
-			if err := json.NewEncoder(w).Encode(item); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Fatal(err.Error())
+	switch r.Method {
+	case http.MethodGet:
+		for _, item := range events {
+			if item.ID == params["id"] {
+				if err := json.NewEncoder(w).Encode(item); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Fatal(err.Error())
+					return
+				}
 				return
 			}
-			return
 		}
-	}
-	http.Error(w, "ID not found", 204)
-}
-
-func CreateEvent(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var event event
-	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
-	}
-	event.ID = strconv.Itoa(rand.Intn(100))
-	events = append(events, event)
-	if err := json.NewEncoder(w).Encode(events); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-		return
-	}
-}
-
-func UpdateEvent(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	if _, err := strconv.Atoi(params["id"]); err != nil {
-		http.Error(w, "ID is not a number", http.StatusBadRequest)
-		log.Println(err.Error())
-		return
-	}
-	for index, item := range events {
-		if item.ID == params["id"] {
-			events = append(events[:index], events[index+1:]...)
-			var event event
-			_ = json.NewDecoder(r.Body).Decode(&event)
-			event.ID = params["id"]
-			events = append(events, event)
-			if err := json.NewEncoder(w).Encode(event); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Println(err.Error())
+		http.Error(w, "ID not found", http.StatusNoContent)
+	case http.MethodPut:
+		for index, item := range events {
+			if item.ID == params["id"] {
+				events = append(events[:index], events[index+1:]...)
+				var event event
+				_ = json.NewDecoder(r.Body).Decode(&event)
+				event.ID = params["id"]
+				events = append(events, event)
+				if err := json.NewEncoder(w).Encode(event); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					log.Println(err.Error())
+					return
+				}
 				return
 			}
-			return
 		}
-	}
-	http.Error(w, "ID not found", http.StatusNoContent)
-}
-
-func DeleteEvent(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	if _, err := strconv.Atoi(params["id"]); err != nil {
-		http.Error(w, "ID is not a number", http.StatusBadRequest)
-		log.Println(err.Error())
-		return
-	}
-	for index, item := range events {
-		if item.ID == params["id"] {
-			events = append(events[:index], events[index+1:]...)
-			break
+		http.Error(w, "ID not found", http.StatusNoContent)
+	case http.MethodDelete:
+		for index, item := range events {
+			if item.ID == params["id"] {
+				events = append(events[:index], events[index+1:]...)
+				break
+			}
 		}
+		http.Error(w, "ID not found", http.StatusNoContent)
 	}
 }

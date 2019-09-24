@@ -22,22 +22,17 @@ func main() {
 	router.Use(authentication.Authentication)
 
 	//Events handlers
-	router.HandleFunc("/events", events.GetEvents).Methods("GET")
-	router.HandleFunc("/events/year/{year}", events.GetEventsYear).Methods("GET")
-	router.HandleFunc("/events/id/{id}", events.GetEvent).Methods("GET")
-	router.HandleFunc("/events", events.CreateEvent).Methods("POST")
-	router.HandleFunc("/events/id/{id}", events.UpdateEvent).Methods("PUT")
-	router.HandleFunc("/events/id/{id}", events.DeleteEvent).Methods("DELETE")
+	router.HandleFunc("/events", events.Events).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc("/events/year/{year}", events.YearEvents).Methods(http.MethodGet)
+	router.HandleFunc("/events/id/{id}", events.IDEvent).Methods(http.MethodGet, http.MethodPut, http.MethodDelete)
 
 	//Index banners handlers
-	router.HandleFunc("/indexbanners", indexbanners.GetIndexBanners).Methods("GET")
-	router.HandleFunc("/indexbanners/visible", indexbanners.GetIndexBannersVisible).Methods("GET")
-	router.HandleFunc("/indexbanners/{id}", indexbanners.UpdateIndexBanner).Methods("PUT")
-	router.HandleFunc("/indexbanners/{id}", indexbanners.UpdateIndexBannersVisibility).Methods("PATCH")
+	router.HandleFunc("/indexbanners", indexbanners.GetIndexBanners).Methods(http.MethodGet)
+	router.HandleFunc("/indexbanners/visible", indexbanners.GetIndexBannersVisible).Methods(http.MethodGet)
+	router.HandleFunc("/indexbanners/{id}", indexbanners.UpdateIndexBanner).Methods(http.MethodGet, http.MethodPut, http.MethodPatch)
 
 	//Contacts handlers (Функционал для контактов)
-	router.HandleFunc("/contacts", contacts.GetContacts).Methods("GET")
-	router.HandleFunc("/contacts", contacts.UpdateContacts).Methods("PUT")
+	router.HandleFunc("/contacts", contacts.Contacts).Methods(http.MethodGet, http.MethodPut)
 	/*
 		//Users handlers (Функционал для пользователей)
 		router.HandleFunc("/users", getUsers).Methods("GET")
