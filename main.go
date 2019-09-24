@@ -18,6 +18,7 @@ func main() {
 	indexbanners.DataInit()
 	contacts.DataInit()
 	authentication.DataInit()
+	//TODO Испробовать logrus в качестве логгера
 
 	router.Use(authentication.Authentication)
 
@@ -34,11 +35,14 @@ func main() {
 	//Contacts handlers (Функционал для контактов)
 	router.HandleFunc("/contacts", contacts.Contacts).Methods(http.MethodGet, http.MethodPut)
 	/*
-		//Users handlers (Функционал для пользователей)
-		router.HandleFunc("/users", getUsers).Methods("GET")
-		router.HandleFunc("/users", createUser).Methods("POST")
-		router.HandleFunc("/users/{id}", updateUser).Methods("PUT")
+		TODO
+			//Users handlers (Функционал для пользователей)
+			router.HandleFunc("/users", getUsers).Methods("GET")
+			router.HandleFunc("/users", createUser).Methods("POST")
+			router.HandleFunc("/users/{id}", updateUser).Methods("PUT")
 	*/
+
+	// TODO Подключить TLS
 	fmt.Println("Starting server...")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }

@@ -17,6 +17,7 @@ type contacts struct {
 
 var contact contacts
 
+//TODO Подключить СУБД в качестве источника
 func DataInit() {
 	contact.Phone1 = "109857438946"
 	contact.Phone2 = "109857438946"
@@ -26,6 +27,7 @@ func DataInit() {
 	contact.MapCode = "https://example.com/map?=12kflankjshiu34rcoqiy"
 }
 
+//TODO Реализовать интерфейс
 func Contacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
