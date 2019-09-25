@@ -22,18 +22,12 @@ func main() {
 
 	router.Use(authentication.Authentication)
 
-	//Events handlers
-	router.HandleFunc("/events", events.Events).Methods(http.MethodGet, http.MethodPost)
-	router.HandleFunc("/events/year/{year}", events.YearEvents).Methods(http.MethodGet)
-	router.HandleFunc("/events/id/{id}", events.IDEvent).Methods(http.MethodGet, http.MethodPut, http.MethodDelete)
-
-	//Index banners handlers
-	router.HandleFunc("/indexbanners", indexbanners.GetIndexBanners).Methods(http.MethodGet)
-	router.HandleFunc("/indexbanners/visible", indexbanners.GetIndexBannersVisible).Methods(http.MethodGet)
-	router.HandleFunc("/indexbanners/{id}", indexbanners.UpdateIndexBanner).Methods(http.MethodGet, http.MethodPut, http.MethodPatch)
-
-	//Contacts handlers (Функционал для контактов)
-	router.HandleFunc("/contacts", contacts.Contacts).Methods(http.MethodGet, http.MethodPut)
+	//Events Subrouter
+	events.Routes(router.PathPrefix("/events").Subrouter())
+	//Index banners Subrouter
+	indexbanners.Routes(router.PathPrefix("/indexbanners").Subrouter())
+	//Contacts Subrouter
+	contacts.Routes(router.PathPrefix("/contacts").Subrouter())
 	/*
 		TODO
 			//Users handlers (Функционал для пользователей)

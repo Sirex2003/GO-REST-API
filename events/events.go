@@ -33,6 +33,14 @@ func DataInit() {
 
 //TODO Реализовать интерфейс
 
+//Subroutes list
+func Routes(r *mux.Router) {
+	r.StrictSlash(true)
+	r.HandleFunc("/", Events).Methods(http.MethodGet, http.MethodPost)
+	r.HandleFunc("/year/{year}", YearEvents).Methods(http.MethodGet)
+	r.HandleFunc("/id/{id}", IDEvent).Methods(http.MethodGet, http.MethodPut, http.MethodDelete)
+}
+
 // Events functions
 func Events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

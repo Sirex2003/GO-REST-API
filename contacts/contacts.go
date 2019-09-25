@@ -2,6 +2,7 @@ package contacts
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -28,6 +29,11 @@ func DataInit() {
 }
 
 //TODO Реализовать интерфейс
+func Routes(subrouter *mux.Router) {
+	subrouter.StrictSlash(true)
+	subrouter.HandleFunc("/", Contacts).Methods(http.MethodGet, http.MethodPut)
+}
+
 func Contacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {

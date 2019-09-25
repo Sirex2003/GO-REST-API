@@ -18,11 +18,21 @@ type indexBanner struct {
 
 var indexBanners []indexBanner
 
+//TODO Подключить СУБД в качестве источника
 func DataInit() {
 	indexBanners = append(indexBanners, indexBanner{"1", "Highload 2019", "Highload++", "5-6 Ноября", false})
 	indexBanners = append(indexBanners, indexBanner{"2", "Jocker 2019", "Jocker", "5-6 Сентябрь", true})
 	indexBanners = append(indexBanners, indexBanner{"3", "РИТ 2019", "РИТ++", "5-6 Октябрь", false})
 	indexBanners = append(indexBanners, indexBanner{"4", "МАКС 2019", "МАКС", "5-6 Декабря", true})
+}
+
+//TODO Реализовать интерфейс
+//Subroutes list
+func Routes(subrouter *mux.Router) {
+	subrouter.StrictSlash(true)
+	subrouter.HandleFunc("/", GetIndexBanners).Methods(http.MethodGet)
+	subrouter.HandleFunc("/visible", GetIndexBannersVisible).Methods(http.MethodGet)
+	subrouter.HandleFunc("/{id}", UpdateIndexBanner).Methods(http.MethodGet, http.MethodPut, http.MethodPatch)
 }
 
 //Index page banners
