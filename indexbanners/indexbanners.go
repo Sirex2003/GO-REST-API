@@ -16,10 +16,12 @@ type indexBanner struct {
 	IsHidden         bool   `json:"is_visible"`
 }
 
+//TODO Подключить СУБД в качестве источника
+
+//Init test data
 var indexBanners []indexBanner
 
-//TODO Подключить СУБД в качестве источника
-func DataInit() {
+func init() {
 	indexBanners = append(indexBanners, indexBanner{"1", "Highload 2019", "Highload++", "5-6 Ноября", false})
 	indexBanners = append(indexBanners, indexBanner{"2", "Jocker 2019", "Jocker", "5-6 Сентябрь", true})
 	indexBanners = append(indexBanners, indexBanner{"3", "РИТ 2019", "РИТ++", "5-6 Октябрь", false})

@@ -5,21 +5,18 @@ import (
 	"./contacts"
 	"./events"
 	"./indexbanners"
+	"./users"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
+//TODO Испробовать logrus в качестве логгера
+
 func main() {
 	router := mux.NewRouter()
-	//init test data
-	events.DataInit()
-	indexbanners.DataInit()
-	contacts.DataInit()
-	authentication.DataInit()
-	//TODO Испробовать logrus в качестве логгера
-
+	//Auth middleware
 	router.Use(authentication.Authentication)
 
 	//Events Subrouter
@@ -28,13 +25,8 @@ func main() {
 	indexbanners.Routes(router.PathPrefix("/indexbanners").Subrouter())
 	//Contacts Subrouter
 	contacts.Routes(router.PathPrefix("/contacts").Subrouter())
-	/*
-		TODO
-			//Users handlers (Функционал для пользователей)
-			router.HandleFunc("/users", getUsers).Methods("GET")
-			router.HandleFunc("/users", createUser).Methods("POST")
-			router.HandleFunc("/users/{id}", updateUser).Methods("PUT")
-	*/
+	//Users Subrouter
+	users.Routes(router.PathPrefix("/users").Subrouter())
 
 	// TODO Подключить TLS
 	fmt.Println("Starting server...")

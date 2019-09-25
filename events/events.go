@@ -21,10 +21,12 @@ type event struct {
 	ExternalURL string `json:"external_url"`
 }
 
+//TODO Подключить СУБД в качестве источника
+
+//Init test data
 var events []event
 
-//TODO Подключить СУБД в качестве источника
-func DataInit() {
+func init() {
 	events = append(events, event{ID: "1", Name: "NTMEX 2003", Header: "NANO TECHNOLOGY EXPO", Description: "Нанотехнологии", Address: "Moscow", StartDate: "2003-12-20", EndDate: "2003-12-25", ExternalURL: "http://ntmex.ru"})
 	events = append(events, event{ID: "2", Name: "FESTIVAL NAUKI 2003", Header: "FESTIVAL NAUKI", Description: "Фестиваль науки", Address: "Moscow", StartDate: "2003-11-20", EndDate: "2003-11-25", ExternalURL: "http://festivalnauki.ru"})
 	events = append(events, event{ID: "3", Name: "МАКС 2003", Header: "МАКС", Description: "Международный авиасалон", Address: "Moscow", StartDate: "2003-10-20", EndDate: "2003-10-25", ExternalURL: "http://maks.ru"})

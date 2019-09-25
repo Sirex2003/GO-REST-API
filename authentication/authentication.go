@@ -7,15 +7,18 @@ type user struct {
 	PasswordHash string `json:"hash"`
 }
 
+//TODO Подключить СУБД в качестве источника
+
+//Init test data
 var user1 user
 
-func DataInit() {
+func init() {
 	user1.Login = "test"
 	user1.PasswordHash = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"
 }
 
 //TODO Перевести на валидацию JWT
-var Authentication = func(next http.Handler) http.Handler {
+func Authentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, hash, ok := r.BasicAuth()
 		if !ok || !checkUsernameAndPassword(user, hash) {

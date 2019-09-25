@@ -16,10 +16,12 @@ type contacts struct {
 	MapCode string `json:"map_code"`
 }
 
+//TODO Подключить СУБД в качестве источника
+
+//Init test data
 var contact contacts
 
-//TODO Подключить СУБД в качестве источника
-func DataInit() {
+func init() {
 	contact.Phone1 = "109857438946"
 	contact.Phone2 = "109857438946"
 	contact.Address = "Москва, Фиг-знает где 48/90"
@@ -29,6 +31,8 @@ func DataInit() {
 }
 
 //TODO Реализовать интерфейс
+
+//Subroutes list
 func Routes(subrouter *mux.Router) {
 	subrouter.StrictSlash(true)
 	subrouter.HandleFunc("/", Contacts).Methods(http.MethodGet, http.MethodPut)
