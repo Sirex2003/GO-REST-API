@@ -3,7 +3,7 @@ package indexbanners
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -28,7 +28,6 @@ func init() {
 	indexBanners = append(indexBanners, indexBanner{"4", "МАКС 2019", "МАКС", "5-6 Декабря", true})
 }
 
-//TODO Реализовать интерфейс
 //Subroutes list
 func Routes(subrouter *mux.Router) {
 	subrouter.StrictSlash(true)
@@ -42,7 +41,7 @@ func GetIndexBanners(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(indexBanners); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
+		logrus.Println(err.Error())
 		return
 	}
 }
@@ -55,7 +54,7 @@ func GetIndexBannersVisible(w http.ResponseWriter, r *http.Request) {
 			i++
 			if err := json.NewEncoder(w).Encode(item); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Println(err.Error())
+				logrus.Println(err.Error())
 				return
 			}
 		}
@@ -71,7 +70,7 @@ func UpdateIndexBanner(w http.ResponseWriter, r *http.Request) {
 	var banner indexBanner
 	if _, err := strconv.Atoi(params["id"]); err != nil {
 		http.Error(w, "ID is not a number", http.StatusBadRequest)
-		log.Println(err.Error())
+		logrus.Println(err.Error())
 		return
 	}
 	switch r.Method {
@@ -80,7 +79,7 @@ func UpdateIndexBanner(w http.ResponseWriter, r *http.Request) {
 			if item.ID == params["id"] {
 				if err := json.NewEncoder(w).Encode(item); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
-					log.Fatal(err.Error())
+					logrus.Fatal(err.Error())
 					return
 				}
 				return
@@ -96,7 +95,7 @@ func UpdateIndexBanner(w http.ResponseWriter, r *http.Request) {
 				indexBanners = append(indexBanners, banner)
 				if err := json.NewEncoder(w).Encode(banner); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
-					log.Println(err.Error())
+					logrus.Println(err.Error())
 					return
 				}
 				return

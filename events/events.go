@@ -3,7 +3,7 @@ package events
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -33,8 +33,6 @@ func init() {
 	events = append(events, event{ID: "4", Name: "HIGHLOAD 2003", Header: "HIGHLOAD", Description: "Высоконагруженные ИТ-системы", Address: "Moscow", StartDate: "2003-09-20", EndDate: "2003-09-25", ExternalURL: "http://highload.ru"})
 }
 
-//TODO Реализовать интерфейс
-
 //Subroutes list
 func Routes(r *mux.Router) {
 	r.StrictSlash(true)
@@ -50,21 +48,21 @@ func Events(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		if err := json.NewEncoder(w).Encode(events); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	case http.MethodPost:
 		var event event
 		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 		event.ID = strconv.Itoa(rand.Intn(100))
 		events = append(events, event)
 		if err := json.NewEncoder(w).Encode(event); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	}
@@ -78,15 +76,15 @@ func YearEvents(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case params["year"] == "":
 		http.Error(w, "YearEvents can not be empty", http.StatusBadRequest)
-		log.Println(r, "YearEvents set empty")
+		logrus.Println(r, "YearEvents set empty")
 		return
 	case err != nil:
 		http.Error(w, "YearEvents must be a number", http.StatusBadRequest)
-		log.Println(r, "YearEvents set as letters")
+		logrus.Println(r, "YearEvents set as letters")
 		return
 	case 2000 < str || str > time.Now().Year():
 		http.Error(w, "Invalid YearEvents value", http.StatusBadRequest)
-		log.Println(r, "Invalid YearEvents value")
+		logrus.Println(r, "Invalid YearEvents value")
 		return
 	}
 	var date time.Time
@@ -95,7 +93,7 @@ func YearEvents(w http.ResponseWriter, r *http.Request) {
 		if date.Format("2006") == params["year"] {
 			if err := json.NewEncoder(w).Encode(item); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Fatal(err.Error())
+				logrus.Fatal(err.Error())
 				return
 			}
 		}
@@ -108,7 +106,7 @@ func IDEvent(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	if _, err := strconv.Atoi(params["id"]); err != nil {
 		http.Error(w, "ID is not a number", http.StatusBadRequest)
-		log.Println(err.Error())
+		logrus.Println(err.Error())
 		return
 	}
 	switch r.Method {
@@ -117,7 +115,7 @@ func IDEvent(w http.ResponseWriter, r *http.Request) {
 			if item.ID == params["id"] {
 				if err := json.NewEncoder(w).Encode(item); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
-					log.Fatal(err.Error())
+					logrus.Fatal(err.Error())
 					return
 				}
 				return
@@ -134,7 +132,7 @@ func IDEvent(w http.ResponseWriter, r *http.Request) {
 				events = append(events, event)
 				if err := json.NewEncoder(w).Encode(event); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
-					log.Println(err.Error())
+					logrus.Println(err.Error())
 					return
 				}
 				return

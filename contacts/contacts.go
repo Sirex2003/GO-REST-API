@@ -3,7 +3,7 @@ package contacts
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -30,8 +30,6 @@ func init() {
 	contact.MapCode = "https://example.com/map?=12kflankjshiu34rcoqiy"
 }
 
-//TODO Реализовать интерфейс
-
 //Subroutes list
 func Routes(subrouter *mux.Router) {
 	subrouter.StrictSlash(true)
@@ -44,13 +42,13 @@ func Contacts(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		if err := json.NewEncoder(w).Encode(contact); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	case http.MethodPut:
 		if err := json.NewDecoder(r.Body).Decode(&contact); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	}

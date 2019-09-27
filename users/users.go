@@ -3,7 +3,7 @@ package users
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"log"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -37,21 +37,21 @@ func usersFunc(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		if err := json.NewEncoder(w).Encode(users); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	case http.MethodPost:
 		var user user
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 		user.Id = strconv.Itoa(rand.Intn(100))
 		users = append(users, user)
 		if err := json.NewEncoder(w).Encode(user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println(err.Error())
+			logrus.Println(err.Error())
 			return
 		}
 	}
@@ -69,7 +69,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 			users = append(users, user)
 			if err := json.NewEncoder(w).Encode(user); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Println(err.Error())
+				logrus.Println(err.Error())
 				return
 			}
 			return

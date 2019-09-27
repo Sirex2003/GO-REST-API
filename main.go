@@ -1,23 +1,21 @@
 package main
 
 import (
-	"./authentication"
-	"./contacts"
-	"./events"
-	"./indexbanners"
-	"./users"
-	"fmt"
 	"github.com/gorilla/mux"
-	"log"
+	"github.com/sirupsen/logrus"
+	"gorestapi/contacts"
+	"gorestapi/events"
+	"gorestapi/indexbanners"
+	"gorestapi/middleware"
+	"gorestapi/users"
 	"net/http"
 )
-
-//TODO Испробовать logrus в качестве логгера
 
 func main() {
 	router := mux.NewRouter()
 	//Auth middleware
-	router.Use(authentication.Authentication)
+	router.Use(middleware.Authentication)
+	router.Use(middleware.RequestLog)
 
 	//Events Subrouter
 	events.Routes(router.PathPrefix("/events").Subrouter())
@@ -28,7 +26,15 @@ func main() {
 	//Users Subrouter
 	users.Routes(router.PathPrefix("/users").Subrouter())
 
+	//Get Heroku port for Web <BEGIN>
+	//port := os.Getenv("PORT")
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	port := "8000"
+	if port == "" {
+		logrus.Fatal("$PORT must be set")
+	}
+	//Get Heroku port for Web <END>
+	logrus.WithFields(logrus.Fields{"port": port}).Info("Starting server")
 	// TODO Подключить TLS
-	fmt.Println("Starting server...")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	logrus.Fatal(http.ListenAndServe(":"+port, router))
 }
