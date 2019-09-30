@@ -40,12 +40,10 @@ func main() {
 	//Get Heroku port for Web <END>
 	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is starting up")
 	// TODO Подключить TLS
-	//logrus.Fatal(http.ListenAndServe(":"+port, router))
 
 	//HTTP-Server with timeouts
 	srv := &http.Server{
-		Addr: "0.0.0.0:" + port,
-		// Good practice to set timeouts to avoid Slowloris attacks.
+		Addr:         "0.0.0.0:" + port,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
