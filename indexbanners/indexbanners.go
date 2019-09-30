@@ -30,11 +30,13 @@ func init() {
 
 //Subroutes list
 func Routes(subrouter *mux.Router) {
-	subrouter.StrictSlash(true)
+	subrouter.HandleFunc("", GetIndexBanners).Methods(http.MethodGet)
 	subrouter.HandleFunc("/", GetIndexBanners).Methods(http.MethodGet)
 	subrouter.HandleFunc("/visible", GetIndexBannersVisible).Methods(http.MethodGet)
 	subrouter.HandleFunc("/{id}", UpdateIndexBanner).Methods(http.MethodGet, http.MethodPut, http.MethodPatch)
 }
+
+//TODO Resource manager to handle edit concurrency
 
 //Index page banners
 func GetIndexBanners(w http.ResponseWriter, r *http.Request) {

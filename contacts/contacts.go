@@ -32,9 +32,11 @@ func init() {
 
 //Subroutes list
 func Routes(subrouter *mux.Router) {
-	subrouter.StrictSlash(true)
+	subrouter.HandleFunc("", Contacts).Methods(http.MethodGet, http.MethodPut)
 	subrouter.HandleFunc("/", Contacts).Methods(http.MethodGet, http.MethodPut)
 }
+
+//TODO Resource manager to handle edit concurrency
 
 func Contacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

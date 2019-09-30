@@ -35,11 +35,13 @@ func init() {
 
 //Subroutes list
 func Routes(r *mux.Router) {
-	r.StrictSlash(true)
+	r.HandleFunc("", Events).Methods(http.MethodGet, http.MethodPost)
 	r.HandleFunc("/", Events).Methods(http.MethodGet, http.MethodPost)
 	r.HandleFunc("/year/{year}", YearEvents).Methods(http.MethodGet)
 	r.HandleFunc("/id/{id}", IDEvent).Methods(http.MethodGet, http.MethodPut, http.MethodDelete)
 }
+
+//TODO Resource manager to handle edit concurrency
 
 // Events functions
 func Events(w http.ResponseWriter, r *http.Request) {

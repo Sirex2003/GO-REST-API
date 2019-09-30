@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	router := mux.NewRouter()
+	router := mux.NewRouter().StrictSlash(true)
 	//Auth middleware
 	router.Use(middleware.Authentication)
 	router.Use(middleware.RequestLog)
@@ -34,12 +34,11 @@ func main() {
 	//port := os.Getenv("PORT")
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	port := "8000"
-	if port == "" {
-		logrus.Fatal("$PORT must be set")
-	}
+	//if port == "" {
+	//	logrus.Fatal("$PORT must be set")
+	//}
 	//Get Heroku port for Web <END>
 	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is starting up")
-	// TODO Подключить TLS
 
 	//HTTP-Server with timeouts
 	srv := &http.Server{
@@ -52,8 +51,8 @@ func main() {
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			logrus.Println(err.Error())
+		if err := srv.ListenAndServeTLS("./certs/server.crt", "./certs/server.key"); err != nil {
+			logrus.WithFields(logrus.Fields{"port": port}).Error(err.Error())
 		}
 	}()
 

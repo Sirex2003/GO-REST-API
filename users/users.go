@@ -24,9 +24,11 @@ func init() {
 	users = append(users, user{"1", "test", "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"})
 }
 
+//TODO Resource manager to handle edit concurrency
+
 //Subroutes list
 func Routes(subrouter *mux.Router) {
-	subrouter.StrictSlash(true)
+	subrouter.HandleFunc("", usersFunc).Methods(http.MethodGet, http.MethodPost)
 	subrouter.HandleFunc("/", usersFunc).Methods(http.MethodGet, http.MethodPost)
 	subrouter.HandleFunc("/{id}", updateUser).Methods(http.MethodPut)
 }
