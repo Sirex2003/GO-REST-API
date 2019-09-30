@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"gorestapi/contacts"
@@ -9,6 +10,9 @@ import (
 	"gorestapi/middleware"
 	"gorestapi/users"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 func main() {
@@ -34,7 +38,37 @@ func main() {
 		logrus.Fatal("$PORT must be set")
 	}
 	//Get Heroku port for Web <END>
-	logrus.WithFields(logrus.Fields{"port": port}).Info("Starting server")
+	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is starting up")
 	// TODO Подключить TLS
-	logrus.Fatal(http.ListenAndServe(":"+port, router))
+	//logrus.Fatal(http.ListenAndServe(":"+port, router))
+
+	//HTTP-Server with timeouts
+	srv := &http.Server{
+		Addr: "0.0.0.0:" + port,
+		// Good practice to set timeouts to avoid Slowloris attacks.
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      router,
+	}
+
+	// Run our server in a goroutine so that it doesn't block.
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			logrus.Println(err.Error())
+		}
+	}()
+
+	//Channel with buffer size = 1, for waiting shutdown command
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	// A deadline to wait for.
+	wait := time.Second * 120
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	srv.Shutdown(ctx)
+	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is shutting down")
+	os.Exit(0)
 }
