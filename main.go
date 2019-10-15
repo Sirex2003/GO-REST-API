@@ -4,11 +4,10 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"gorestapi/contacts"
-	"gorestapi/events"
-	"gorestapi/indexbanners"
-	"gorestapi/middleware"
-	"gorestapi/users"
+	"gorestapi/controller"
+	"gorestapi/modules/datainit"
+	"gorestapi/modules/middleware"
+	"gorestapi/view"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,29 +15,34 @@ import (
 )
 
 func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	//Auth middleware
+	//TODO Migrate to standart "net/http"
+	datainit.InitTestData()
+	//Router
+	router := mux.NewRouter()
+	//Middleware
 	router.Use(middleware.Authentication)
 	router.Use(middleware.RequestLog)
 
-	//Events Subrouter
-	events.Routes(router.PathPrefix("/events").Subrouter())
-	//Index banners Subrouter
-	indexbanners.Routes(router.PathPrefix("/indexbanners").Subrouter())
-	//Contacts Subrouter
-	contacts.Routes(router.PathPrefix("/contacts").Subrouter())
-	//Users Subrouter
-	users.Routes(router.PathPrefix("/users").Subrouter())
+	//Sub-Routers @Controllers
+	controller.EventsRoutes(router.Methods(http.MethodPost, http.MethodPut, http.MethodDelete).PathPrefix("/events").Subrouter())
+	controller.IndexbannersRoutes(router.Methods(http.MethodPut, http.MethodPatch).PathPrefix("/indexbanners").Subrouter())
+	controller.ContactsRoutes(router.Methods(http.MethodPut).PathPrefix("/contacts").Subrouter())
+	controller.UsersRoutes(router.Methods(http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete).PathPrefix("/users").Subrouter())
+
+	//Sub-Routers @Views
+	view.EventsRoutes(router.Methods(http.MethodGet).PathPrefix("/events").Subrouter())
+	view.IndexBannersRoutes(router.Methods(http.MethodGet).PathPrefix("/indexbanners").Subrouter())
+	view.ContactsRoutes(router.Methods(http.MethodGet).PathPrefix("/contacts").Subrouter())
+	view.UsersRoutes(router.Methods(http.MethodGet).PathPrefix("/users").Subrouter())
 
 	//Get Heroku port for Web <BEGIN>
 	//port := os.Getenv("PORT")
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+
 	port := "8000"
 	//if port == "" {
 	//	logrus.Fatal("$PORT must be set")
 	//}
 	//Get Heroku port for Web <END>
-	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is starting up")
 
 	//HTTP-Server with timeouts
 	srv := &http.Server{
@@ -51,10 +55,12 @@ func main() {
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		if err := srv.ListenAndServeTLS("./certs/server.crt", "./certs/server.key"); err != nil {
+		if err := srv.ListenAndServeTLS("./modules/certs/server.crt", "./modules/certs/server.key"); err != nil {
 			logrus.WithFields(logrus.Fields{"port": port}).Error(err.Error())
 		}
 	}()
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.WithFields(logrus.Fields{"port": port}).Info("Server is starting up")
 
 	//Channel with buffer size = 1, for waiting shutdown command
 	c := make(chan os.Signal, 1)

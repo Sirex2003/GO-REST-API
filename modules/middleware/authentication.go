@@ -1,6 +1,9 @@
 package middleware
 
-import "net/http"
+import (
+	"gorestapi/modules/datainit"
+	"net/http"
+)
 
 type user struct {
 	Login        string `json:"login"`
@@ -30,5 +33,8 @@ func Authentication(next http.Handler) http.Handler {
 }
 
 func checkUsernameAndPassword(login, hash string) bool {
-	return login == user1.Login && hash == user1.PasswordHash
+	for i := range datainit.UsersData {
+		return login == datainit.UsersData[i].Login && hash == datainit.UsersData[i].Password
+	}
+	return false
 }

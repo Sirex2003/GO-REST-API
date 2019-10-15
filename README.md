@@ -1,6 +1,6 @@
 ## Hobby-project for learning GO
 ### Features:
-**1. Middleware, handlers and Subroutes.**
+**1. Middleware, Handlers and Subroutes.**
 
 **2. TLS.**
 
