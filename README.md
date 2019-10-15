@@ -1,11 +1,19 @@
-## Hobby-project for learning GO
-### Features:
-**1. Middleware, Handlers and Subroutes.**
+### Hobby-project for learning GO
+#### Structure:
+**Modules** - Middlewares, Logic, Data modules.
 
-**2. TLS.**
+**View** - All the "GET" functions.
 
-**3. BASIC-Auth.**
+**View** - All data-modifying functions.
 
-**4. JSON encode/decode.**
+#### Features:
+***1. Middleware, Handlers and Subroutes.***
 
-**5. SWITCH/CASE.**
+***2. TLS.***
+
+***3. BASIC-Auth.***
+
+***4. JSON encode/decode.***
+
+***5. SWITCH/CASE.***
+
